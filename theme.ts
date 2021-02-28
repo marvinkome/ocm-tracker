@@ -10,6 +10,7 @@ const components = {
         variants: {
             solid: {
                 bg: "gray.50",
+                color: "gray.900",
                 _hover: {
                     bg: "gray.300",
                 },
