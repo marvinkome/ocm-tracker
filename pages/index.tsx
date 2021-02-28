@@ -1,5 +1,6 @@
 import React from "react"
 import NextLink from "next/link"
+import config from "config"
 import { Layout } from "components/layout"
 import { Box, Flex, Wrap, Heading, Text, WrapItem, Image, Button } from "@chakra-ui/react"
 
@@ -16,35 +17,17 @@ function Page() {
 
                 {/* list of leagues */}
                 <Wrap spacing={8} justify="center">
-                    <WrapItem>
-                        <NextLink href="/premier-league">
-                            <a>
-                                <Button py={8} px={14}>
-                                    <Image boxSize="50px" src="/images/pl-logo.png" />
-                                </Button>
-                            </a>
-                        </NextLink>
-                    </WrapItem>
-
-                    <WrapItem>
-                        <NextLink href="/championship">
-                            <a>
-                                <Button py={8} px={14}>
-                                    <Image boxSize="50px" src="/images/efl-logo.png" />
-                                </Button>
-                            </a>
-                        </NextLink>
-                    </WrapItem>
-
-                    <WrapItem>
-                        <NextLink href="/bundesliga">
-                            <a>
-                                <Button py={8} px={14}>
-                                    <Image boxSize="50px" src="/images/bundesliga-logo.png" />
-                                </Button>
-                            </a>
-                        </NextLink>
-                    </WrapItem>
+                    {Object.entries(config.leagues).map(([leagueId, league]) => (
+                        <WrapItem key={leagueId}>
+                            <NextLink href={league.link}>
+                                <a>
+                                    <Button py={8} px={14}>
+                                        <Image alt={league.name} boxSize="50px" src={league.logo} />
+                                    </Button>
+                                </a>
+                            </NextLink>
+                        </WrapItem>
+                    ))}
                 </Wrap>
             </Flex>
         </Layout>
