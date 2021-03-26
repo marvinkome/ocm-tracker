@@ -1,7 +1,7 @@
 export default {
     serviceAccount: {
         client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-        private_key: (process.env.GOOGLE_PRIVATE_KEY as string).replace(/\\n/g, "\n"),
+        private_key: ((process.env.GOOGLE_PRIVATE_KEY as string) || "").replace(/\\n/g, "\n"),
     },
     leagues: {
         premierLeague: {

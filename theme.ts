@@ -8,7 +8,7 @@ const config: ThemeConfig = {
 const components = {
     Button: {
         variants: {
-            solid: {
+            primary: {
                 bg: "gray.50",
                 color: "gray.900",
                 _hover: {
