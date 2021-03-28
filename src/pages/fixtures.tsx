@@ -20,7 +20,6 @@ import {
     Flex,
     Checkbox,
     ModalFooter,
-    Center,
     Accordion,
     AccordionButton,
     AccordionIcon,
