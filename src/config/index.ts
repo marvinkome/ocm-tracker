@@ -21,7 +21,7 @@ export default {
             logo: "/images/efl-logo.png",
             link: "/championship",
             sheetsInfo: {
-                sheetsId: "",
+                sheetsId: "13mebTP0t7wktz5t43ERDIJPQmHqhl2Mk2OhDQ2KmSZU",
                 managersTabId: "2144170355",
             },
         },

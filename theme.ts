@@ -12,7 +12,20 @@ const components = {
                 bg: "gray.50",
                 color: "gray.900",
                 _hover: {
-                    bg: "gray.300",
+                    bg: "gray.200",
+
+                    _disabled: {
+                        bg: "gray.200",
+                    },
+                },
+                _focus: {
+                    bg: "gray.200",
+                },
+                _active: {
+                    bg: "gray.200",
+                },
+                _loading: {
+                    bg: "gray.200",
                 },
             },
         },

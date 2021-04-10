@@ -1,8 +1,12 @@
 import React from "react"
 import Head from "next/head"
+import Link from "next/link"
 import { Container, Flex, Heading, HStack, Text } from "@chakra-ui/react"
+import { useAuth } from "lib/auth-context"
 
 export function Layout({ children, title }: { children: any; title: string }) {
+    const { isLoggedIn } = useAuth()!
+
     return (
         <>
             <Head>
@@ -20,15 +24,21 @@ export function Layout({ children, title }: { children: any; title: string }) {
                 px={{ md: 14, base: 5 }}
                 mt={{ md: 10, base: 5 }}
             >
-                <Heading color="green.200" size="xl">
-                    OCM Tracker
-                </Heading>
+                <Link href="/">
+                    <a>
+                        <Heading color="green.200" size="xl">
+                            OCM Tracker
+                        </Heading>
+                    </a>
+                </Link>
 
-                <HStack mt={{ base: 2, md: 0 }}>
-                    <Text fontWeight="bold">Middlesbrough</Text>
-                    <Text>-</Text>
-                    <Text>@marvinkome</Text>
-                </HStack>
+                {isLoggedIn && (
+                    <HStack mt={{ base: 2, md: 0 }}>
+                        <Text fontWeight="bold">Middlesbrough</Text>
+                        <Text>-</Text>
+                        <Text>@marvinkome</Text>
+                    </HStack>
+                )}
             </Flex>
 
             <Container my={5}>{children}</Container>
