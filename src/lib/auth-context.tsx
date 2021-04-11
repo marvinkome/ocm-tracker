@@ -1,17 +1,26 @@
-import { getUser, getUserClub } from "lib/helpers"
 import React from "react"
+import { useRouter } from "next/router"
+import { getUser } from "lib/helpers"
 
-export type AuthContextType = null | {
-    signIn: (data: { username: string; refreshToken: string; club: string }) => void
+// context
+export type AuthContextType = {
+    signIn: (payload: any) => void
     signOut: () => void
-    setClub: (club: string) => void
+    setIsLoaded: (loaded: boolean) => void
+    profile: { username: string; club: string }
     isLoggedIn: boolean
-    loaded: boolean
-    username?: string
-    club?: string
+    isLoaded: boolean
 }
 
-const AuthContext = React.createContext<AuthContextType>(null)
+const initialData: AuthContextType = {
+    signIn: (payload: any) => null,
+    signOut: () => null,
+    setIsLoaded: (loaded: boolean) => null,
+    profile: { username: "", club: "" },
+    isLoggedIn: false,
+    isLoaded: false,
+}
+const AuthContext = React.createContext<AuthContextType>(initialData)
 
 export const COOKIE_NAME = "OCM_TRACKER"
 export function useAuth() {
@@ -19,64 +28,81 @@ export function useAuth() {
     return context
 }
 
-export const AuthProvider: React.FC = (props) => {
-    const [userData, setUserData] = React.useState({
-        club: undefined as string | undefined,
-        username: undefined as string | undefined,
-    })
-
-    const [loaded, setIsLoaded] = React.useState(false)
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-
-    const _value = {
-        ...userData,
-        loaded,
-        isLoggedIn,
-
-        signIn: (_data: { username: string; refreshToken: string }) => {
-            const { refreshToken, ...data } = _data
-            setUserData({ ...userData, ...data })
-            setIsLoggedIn(true)
-
-            localStorage.setItem(COOKIE_NAME, refreshToken)
-        },
-
-        setClub: (club: string) => {
-            setUserData({ ...userData, club })
-        },
-
-        signOut: () => {
-            setUserData({ club: undefined, username: undefined })
-            setIsLoggedIn(false)
-
-            localStorage.removeItem(COOKIE_NAME)
-        },
+// provide
+function useContextReducer() {
+    const initialState = {
+        profile: { username: "", club: "" },
+        isLoggedIn: false,
     }
 
+    const reducer = (state: any, action: any) => {
+        switch (action.type) {
+            case "SIGN_IN": {
+                const { refreshToken, ...profile } = action.payload
+
+                localStorage.setItem(COOKIE_NAME, refreshToken)
+                return { ...state, isLoggedIn: true, profile }
+            }
+            case "SIGN_OUT": {
+                localStorage.removeItem(COOKIE_NAME)
+                return { ...state, isLoggedIn: false, profile: initialState.profile }
+            }
+            case "RESET": {
+                return initialState
+            }
+            default:
+                throw new Error()
+        }
+    }
+
+    const [state, dispatch] = React.useReducer(reducer, initialState)
+
+    const signIn = React.useCallback((payload) => {
+        dispatch({ type: "SIGN_IN", payload })
+    }, [])
+
+    const signOut = React.useCallback(() => {
+        dispatch({ type: "SIGN_OUT" })
+    }, [])
+
+    return {
+        ...state,
+        signIn,
+        signOut,
+    }
+}
+
+export const AuthProvider: React.FC = (props) => {
+    const router = useRouter()
+    const [isLoaded, setIsLoaded] = React.useState(false)
+    const state = useContextReducer()
+
     React.useEffect(() => {
-        const token = localStorage.getItem(COOKIE_NAME)
+        const token = localStorage.getItem(COOKIE_NAME) // get refreshToken
         if (!token) {
             setIsLoaded(true)
-
             return
         }
 
-        ;(async () => {
+        // load user from refreshToken
+        const fn = async () => {
             try {
-                const resp = await getUser({ token })
-                _value.signIn(resp)
-                setIsLoaded(true)
-
-                // in the background we fetch the club name
-                const club = await getUserClub(resp.username).catch(() => undefined)
-                _value.setClub(club)
+                const resp = await getUser({ token, competition: `${router.query.league}` })
+                state.signIn(resp)
             } catch (err) {
-                _value.signOut()
+                setIsLoaded(true)
+            } finally {
                 setIsLoaded(true)
             }
-        })()
+        }
+
+        fn()
     }, [])
 
-    const value = React.useMemo(() => _value, [userData, loaded, isLoggedIn])
+    const value = React.useMemo(() => ({ ...state, isLoaded, setIsLoaded }), [
+        state,
+        isLoaded,
+        setIsLoaded,
+    ])
     return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>
 }

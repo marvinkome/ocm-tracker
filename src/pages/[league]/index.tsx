@@ -1,13 +1,24 @@
 import React from "react"
+import config from "config"
+import { useRouter } from "next/router"
 import { Center, Spinner } from "@chakra-ui/react"
-import { LoginPage } from "containers/home"
 import { Layout } from "components/layout"
 import { useAuth } from "lib/auth-context"
 
 function Page() {
-    const { isLoggedIn, loaded } = useAuth()!
+    const { isLoggedIn, isLoaded } = useAuth()!
+    const router = useRouter()
 
-    if (!loaded) {
+    React.useEffect(() => {
+        if (!isLoggedIn && isLoaded) {
+            router.push({
+                pathname: "/[league]/login",
+                query: { league: router.query.league },
+            })
+        }
+    }, [isLoaded, isLoggedIn])
+
+    if (!isLoaded || !isLoggedIn) {
         return (
             <Center h="100vh">
                 <Spinner
@@ -21,7 +32,25 @@ function Page() {
         )
     }
 
-    return <Layout title="Home">{isLoggedIn ? <p>Hello world</p> : <LoginPage />}</Layout>
+    return (
+        <Layout title="Home">
+            <p>Hello world</p>
+        </Layout>
+    )
+}
+
+export const getStaticProps = async () => {
+    return {
+        props: {},
+    }
+}
+
+export const getStaticPaths = async () => {
+    const paths = Object.values(config.leagues).map((v) => ({
+        params: { league: v.link.replace("/", "") },
+    }))
+
+    return { paths, fallback: false }
 }
 
 export default Page

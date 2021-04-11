@@ -1,4 +1,5 @@
 import { getUser, requestToken } from "lib/discord"
+import { getManagerClub } from "lib/firebase"
 import { NextApiRequest, NextApiResponse } from "next"
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -6,15 +7,17 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(404).send({ message: "Page not found" })
     }
 
-    const { code, token } = req.body
+    const { code, token, competition } = req.body
 
     try {
         const resp = await requestToken({ code, token })
-        const userDetails = await getUser(resp.access_token)
+        const { username } = await getUser(resp.access_token)
+        const club = await getManagerClub(username, competition)
 
         return res.send({
             refreshToken: resp.refresh_token,
-            username: userDetails.username,
+            username,
+            club,
         })
     } catch (err) {
         console.error(err.message)

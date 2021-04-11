@@ -24,7 +24,7 @@ export function toParams(query: string) {
     }, {})
 }
 
-export async function getUser(body: { code?: string; token?: string }) {
+export async function getUser(body: { competition: string; code?: string; token?: string }) {
     const authResp = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

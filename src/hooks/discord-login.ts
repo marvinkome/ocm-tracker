@@ -1,4 +1,5 @@
 import PopupWindow from "lib/popupWindow"
+import { useRouter } from "next/router"
 import { v4 as uuidv4 } from "uuid"
 import { toQuery, getUser } from "lib/helpers"
 import { useToast } from "@chakra-ui/react"
@@ -8,6 +9,7 @@ import { useState } from "react"
 export const useDiscordLogin = () => {
     const toast = useToast()
     const authContext = useAuth()
+    const router = useRouter()
     const [isFetching, setIsFetching] = useState(false)
 
     const state = uuidv4()
@@ -22,6 +24,7 @@ export const useDiscordLogin = () => {
 
     const signIn = async () => {
         setIsFetching(true)
+
         try {
             const data = await PopupWindow.open(
                 "discord_auth",
@@ -31,11 +34,14 @@ export const useDiscordLogin = () => {
                     width: 600,
                 }
             )
+
             if (data.state !== state) {
                 throw new Error("State changed during authentication")
             }
-            const resp = await getUser({ code: data.code })
-            authContext?.signIn(resp)
+
+            // get use details from server
+            const resp = await getUser({ code: data.code, competition: `${router.query.league}` })
+            authContext.signIn(resp)
         } catch (e) {
             console.log(e)
             toast({
@@ -44,8 +50,10 @@ export const useDiscordLogin = () => {
                 isClosable: true,
                 title: "Error logging in",
             })
+        } finally {
+            authContext.setIsLoaded(true)
+            setIsFetching(false)
         }
-        setIsFetching(false)
     }
 
     return { signIn, isFetching }

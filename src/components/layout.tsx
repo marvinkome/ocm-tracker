@@ -5,7 +5,7 @@ import { Container, Flex, Heading, HStack, Text } from "@chakra-ui/react"
 import { useAuth } from "lib/auth-context"
 
 export function Layout({ children, title }: { children: any; title: string }) {
-    const { isLoggedIn } = useAuth()!
+    const { isLoggedIn, profile } = useAuth()!
 
     return (
         <>
@@ -34,9 +34,11 @@ export function Layout({ children, title }: { children: any; title: string }) {
 
                 {isLoggedIn && (
                     <HStack mt={{ base: 2, md: 0 }}>
-                        <Text fontWeight="bold">Middlesbrough</Text>
+                        <Text textTransform="capitalize" fontWeight="bold">
+                            {profile.club}
+                        </Text>
                         <Text>-</Text>
-                        <Text>@marvinkome</Text>
+                        <Text>@{profile.username}</Text>
                     </HStack>
                 )}
             </Flex>

@@ -10,7 +10,7 @@ function Page() {
                 <Box mb={12}>
                     <Heading align="center">Welcome to OCM Tracker</Heading>
                     <Text align="center" pt={2} color="gray.400">
-                        Please select league
+                        Please select competition
                     </Text>
                 </Box>
 
