@@ -23,28 +23,3 @@ export function toParams(query: string) {
         return values
     }, {})
 }
-
-export async function getUser(body: { competition: string; code?: string; token?: string }) {
-    const authResp = await fetch("/api/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-    })
-
-    if (authResp.status !== 200) {
-        throw new Error("")
-    }
-
-    const auth = await authResp.json()
-    return auth
-}
-
-export async function getUserClub(userName: string) {
-    const clubResp = await fetch(`/api/sheets/user-club?managerName=${userName}`)
-    if (clubResp.status !== 200) {
-        throw new Error("")
-    }
-
-    const clubPayload = await clubResp.json()
-    return clubPayload.payload
-}

@@ -1,20 +1,18 @@
 import { NextApiRequest, NextApiResponse } from "next"
-import { getManagerClub } from "lib/firebase"
+import { getFixtures } from "services/firebase"
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method !== "GET") {
         return res.status(404).send({ message: "Page not found" })
     }
 
-    const { managerName, competition } = req.query
+    const { league } = req.query
 
     try {
-        const club = await getManagerClub(`${managerName}`, `${competition}`)
+        const fixtures = await getFixtures("MID", league as string)
 
         return res.status(200).send({
-            payload: {
-                club,
-            },
+            payload: { fixtures },
         })
     } catch (err) {
         return res.status(500).send({ message: err.message })

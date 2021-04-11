@@ -31,4 +31,17 @@ export async function getManagerClub(username: string, league: string) {
     return club
 }
 
+export async function getFixtures(club: string, league: string) {
+    const sheetId = Object.values(config.leagues).find((v) => v.id === league)?.sheetsInfo.sheetsId
+
+    const sheetRef = db
+        .ref(`${sheetId}/Fixtures/${club}`)
+        .orderByChild("hasPlayed")
+        .equalTo(false)
+        .limitToFirst(3)
+
+    const value = await (await sheetRef.once("value")).val()
+    return value.filter((v: any) => !!v)
+}
+
 export default admin

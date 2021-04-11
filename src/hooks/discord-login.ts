@@ -1,7 +1,8 @@
 import PopupWindow from "lib/popupWindow"
 import { useRouter } from "next/router"
 import { v4 as uuidv4 } from "uuid"
-import { toQuery, getUser } from "lib/helpers"
+import { toQuery } from "lib/helpers"
+import { getUser } from "services/api"
 import { useToast } from "@chakra-ui/react"
 import { useAuth } from "lib/auth-context"
 import { useState } from "react"
@@ -40,7 +41,7 @@ export const useDiscordLogin = () => {
             }
 
             // get use details from server
-            const resp = await getUser({ code: data.code, competition: `${router.query.league}` })
+            const resp = await getUser(`${router.query.league}`, { code: data.code })
             authContext.signIn(resp)
         } catch (e) {
             console.log(e)

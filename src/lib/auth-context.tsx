@@ -1,6 +1,6 @@
 import React from "react"
 import { useRouter } from "next/router"
-import { getUser } from "lib/helpers"
+import { getUser } from "services/api"
 
 // context
 export type AuthContextType = {
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC = (props) => {
         // load user from refreshToken
         const fn = async () => {
             try {
-                const resp = await getUser({ token, competition: `${router.query.league}` })
+                const resp = await getUser(`${router.query.league}`, { token })
                 state.signIn(resp)
             } catch (err) {
                 setIsLoaded(true)
